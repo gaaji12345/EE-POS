@@ -6,9 +6,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
+import javax.json.stream.JsonParsingException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -139,7 +138,117 @@ public class CustomerServlet extends HttpServlet {
     }
 
     @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("update me");
+
+        //resp.getWriter();
+        PrintWriter writer = resp.getWriter();
+        resp.setContentType ( "application/json");
+
+        resp.addHeader("Access-Control-Allow-Origin","*");
+
+        JsonReader reader = Json.createReader(req.getReader());
+        JsonObject jsonObject = reader.readObject();
+
+        String id = jsonObject.getString("id");
+        String name = jsonObject.getString("name");
+        String address = jsonObject.getString("address");
+        String salary = jsonObject.getString("salary" );
+
+
+        System.out.println(id+" "+name+" "+address+" "+salary);
+
+
+        try {
+
+            Connection connection = ds.getConnection();
+            PreparedStatement pstm = connection.prepareStatement("update customer set  name=?,address=?,salary=?  where id=? ");
+
+            pstm.setObject(1, name);
+            pstm.setObject(2, address);
+            pstm.setObject(3, salary);
+            pstm.setObject(4, id);
+            boolean b = pstm.executeUpdate() > 0;
+
+            if (b) {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Succefully Updated");
+                objectBuilder.add("status", 200);
+
+                writer.print(objectBuilder.build());
+
+            } else {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Update Failed");
+                objectBuilder.add("status", 400);
+                writer.print(objectBuilder.build());
+            }
+            connection.close();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }catch (JsonParsingException e){
+
+        }
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("cus delete");
+        String id=req.getParameter("cusID");
+        System.out.println(id);
+        PrintWriter writer = resp.getWriter();
+        resp.setContentType ( "application/json");
+
+        resp.addHeader("Access-Control-Allow-Origin","*");
+        try {
+
+            Connection connection = ds.getConnection();
+            PreparedStatement pstm = connection.prepareStatement("delete from customer where id=?");
+            pstm.setObject(1, id);
+            boolean b = pstm.executeUpdate() > 0;
+
+
+            if (b) {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Succefully deletd");
+                objectBuilder.add("status", 200);
+
+                writer.print(objectBuilder.build());
+
+            } else {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("status", 400);
+                objectBuilder.add("data", "Wrong data");
+                objectBuilder.add("message", "");
+
+
+                writer.print(objectBuilder.build());
+            }
+            connection.close();
+
+        } catch (SQLException throwables) {
+            resp.setStatus(200);
+//            throw new RuntimeException(e);
+            throwables.printStackTrace();
+            //  resp.sendError(500,throwables.getMessage());JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            objectBuilder.add("status",500);
+            objectBuilder.add("data",throwables.getLocalizedMessage());
+            objectBuilder.add("message","Error");
+
+            writer.print(objectBuilder.build());
+        }
+    }
+
+    @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.addHeader("Access-Control-Allow-Origin","*");//
+        resp.addHeader("Access-Control-Allow-Methods","DELETE, PUT");
+        resp.addHeader("Access-Control-Allow-Headers","Content-Type");
     }
 }
