@@ -1,4 +1,8 @@
+ $(document).ready(function() {
 
+LoadAll();
+
+ });
 
 $('#btnsaveCustomer').click(function (){
  saveCustomer();
@@ -72,41 +76,49 @@ function LoadAll() {
 
 }
 
-// $('#btnUpCustomer').click(function (){
-//
-//     let consent=confirm("ARE YOU SHURE NEED TO UPDATE..?");
-//
-//     if (consent){
-//         for (let i = 0; i < customers.length; i++) {
-//             if ($('#txtCid').val()==customers[i].customerID){
-//                 customers[i].customerID=$('#txtCid').val();
-//                 customers[i].customerName=$('#txtName').val();
-//                 customers[i].customerAddress=$('#txtAddress').val();
-//                 customers[i].customerContact=$('#txtContact').val();
-//                 //getAllCustomer();
-//                 LoadAll();
-//                 //clearCustomerFeilds();
-//                 clearFeilds();
-//                 alert("UPDATED SUCSUS");
-//                 break;
-//             }
-//         }
-//     }
-//
-//
-//
-// });
+$('#btnUpCustomer').click(function (){
+    updateCustomer();
 
-// $('#btnDeleteCustomer').click(function (){
-//
-//     let deleteId= $('#txtCid').val();
-//     if (deleteId) {
-//         deleteCustomer(deleteId);
-//         alert("DELETE...!");
-//     }else {
-//         alert("CHECK AGAIN....!");
-//     }
-// });
+    // let consent=confirm("ARE YOU SHURE NEED TO UPDATE..?");
+    //
+    // if (consent){
+    //   updateCustomer();
+    // }else {
+    //     alert("Not Allowed..!");
+    // }
+
+
+
+});
+
+$('#btnDeleteCustomer').click(function (){
+
+    let customerID = $("#txtCid").val();
+    $.ajax({
+        url:"http://localhost:4008/backend/customer?cusID="+customerID,
+        method:"DELETE",
+        // data:data ,
+        success:function (res){
+            console.log(res)
+            if (res.status==200){
+                alert(res.message);
+                loadAllCustomer();
+
+            }else if (res.status==400){
+                alert(res.data);
+            }else {
+                alert(res.data)
+            }
+
+        },
+        error:function (ob,status,t){
+            console.log(ob);
+            console.log(status);
+            console.log(t);
+
+        }
+    })
+});
 function btnRowClick (){
     $('#tbCustomer>tr').click(function (){
         let id=$(this).children(":eq(0)").text();
@@ -161,19 +173,7 @@ function searchCustomer(id){
 }
 
 $('#btnsearchCustomer').click(function (){
-    // var  searchId=$("#txtFinds").val();
-    // var responce=searchCustomer(searchId);
-    // if (responce){
-    //     $("#txtCid").val(responce.customerID);
-    //     $("#txtName").val(responce.customerName);
-    //     $("#txtAddress").val(responce.customerAddress);
-    //     $("#txtContact").val(responce.customerContact);
-    //
-    //
-    // }else {
-    //    clearFeilds();
-    //     alert("No Customer Find...!")
-    // }
+
 });
 
 
@@ -186,18 +186,36 @@ function deleteCustomer(cId){
     // }
 }
 
-function updateCustomer(cId){
-    // let customer=searchCustomer(cId);
-    // if (customer!=null){
-    //     customer.customerID=$('#txtCid').val();
-    //     customer.customerName=$('#txtName').val();
-    //     customer.customerAddress=$('#txtAddress').val();
-    //     customer.customerContact=$('#txtContact').val();
-    //    LoadAll;
-    //     return true;
-    // }else {
-    //     return false;
-    // }
+function updateCustomer(){
+    var cusOb={
+        id: $('#txtCid').val(),
+        name:$('#txtName').val(),
+        address: $('#txtAddress').val(),
+        salary:$('#txtContact').val()
+    }
+
+    // console.log(formdata);
+    $.ajax({
+        url:"http://localhost:4008/backend/customer",
+        method:"PUT",
+        contentType:"application/json",//request contetnt type json
+        data:JSON.stringify(cusOb),
+        success:function (res){
+            if (res.status=200){
+                alert(res.message)
+                loadAllCustomer();
+            }else if (res.status==400){
+                alert(res.message)
+            }else {
+                alert(res.data)
+            }
+
+        },
+        error:function (ob,txtStatus,error){
+            alert(txtStatus);
+            console.log(ob.responseText)
+        }
+    })
 
 }
 
