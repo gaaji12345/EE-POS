@@ -6,9 +6,8 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-import javax.json.Json;
-import javax.json.JsonArrayBuilder;
-import javax.json.JsonObjectBuilder;
+import javax.json.*;
+import javax.json.stream.JsonParsingException;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -89,6 +88,8 @@ public class ItemServlet extends HttpServlet {
         }
     }
 
+
+
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String code=  req.getParameter("itemCode");
@@ -136,6 +137,65 @@ public class ItemServlet extends HttpServlet {
             objectBuilder.add("data",throwables.getLocalizedMessage());
             writer.print(objectBuilder.build());
             throwables.printStackTrace();
+        }
+    }
+
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("update me");
+
+        //resp.getWriter();
+        PrintWriter writer = resp.getWriter();
+        resp.setContentType ( "application/json");
+
+        resp.addHeader("Access-Control-Allow-Origin","*");
+
+        JsonReader reader = Json.createReader(req.getReader());
+        JsonObject jsonObject = reader.readObject();
+
+        String code = jsonObject.getString("code");
+        String desc = jsonObject.getString("desc");
+        String price = jsonObject.getString("price");
+        String qty = jsonObject.getString("qty" );
+
+
+        System.out.println(code+" "+desc+" "+price+" "+qty);
+
+
+        try {
+
+            Connection connection = ds.getConnection();
+            PreparedStatement pstm = connection.prepareStatement("update item set   description =?,unitPrice=?,qtyOnHand =?  where code=? ");
+
+            pstm.setObject(1, desc);
+            pstm.setObject(2, price);
+            pstm.setObject(3, qty);
+            pstm.setObject(4, code);
+            boolean b = pstm.executeUpdate() > 0;
+
+            if (b) {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Succefully Updated");
+                objectBuilder.add("status", 200);
+
+                writer.print(objectBuilder.build());
+
+            } else {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Update Failed");
+                objectBuilder.add("status", 400);
+                writer.print(objectBuilder.build());
+            }
+            connection.close();
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }catch (JsonParsingException e){
+
         }
     }
 
