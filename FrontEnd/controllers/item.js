@@ -84,43 +84,16 @@ $('#btnUpdateItem').click(function (){
     }
 });
 //
-// $('#btnDeleteItem').click(function (){
-//     let deleteId= $('#txtitemcode').val();
-//     if (deleteId) {
-//         deleteItem(deleteId);
-//         alert("DELETE...!");
-//     }else {
-//         alert("CHECK AGAIN....!");
-//     }
-// });
-//
-// function btnRowClick (){
-//     $('#tbItem>tr').click(function (){
-//         let id=$(this).children(":eq(0)").text();
-//         let name=$(this).children(":eq(1)").text();
-//         let price=$(this).children(":eq(2)").text();
-//         let qty=$(this).children(":eq(3)").text();
-//
-//         // console.log(id,name,address,contact);
-//
-//         $('#txtitemcode').val(id);
-//         $('#txtitemname').val(name);
-//         $('#txtprice').val(price);
-//         $('#txtqty').val(qty);
-//
-//     });
-//
-// }
-//
-// function remove(){
-//     $("#tbItem>tr").dblclick(function () {
-//         // $("#tb>tr").remove();
-//         // alert("fdfdf");
-//         $(this).remove();
-//
-//
-//     });
-// }
+$('#btnDeleteItem').click(function (){
+  let cnform=confirm("ARE YOU SHURE YOU NEED TO DELETE THIS..?")
+
+    if (cnform){
+        itemDelete();
+    }else {
+        alert("Try Again...!");
+    }
+});
+
  function  itemUpdate(){
      var itemOb={
          code: $('#txtitemcode').val(),
@@ -149,6 +122,35 @@ $('#btnUpdateItem').click(function (){
          error:function (ob,txtStatus,error){
              alert(txtStatus);
              console.log(ob.responseText)
+         }
+     })
+ }
+
+ function itemDelete(){
+
+     let itemId = $("#txtitemcode").val();
+     $.ajax({
+         url:"http://localhost:4008/backend/item?itemCode="+itemId,
+         method:"DELETE",
+         // data:data ,
+         success:function (res){
+             console.log(res)
+             if (res.status==200){
+                 alert(res.message);
+             loadAllItems();
+
+             }else if (res.status==400){
+                 alert(res.data);
+             }else {
+                 alert(res.data)
+             }
+
+         },
+         error:function (ob,status,t){
+             console.log(ob);
+             console.log(status);
+             console.log(t);
+
          }
      })
  }
