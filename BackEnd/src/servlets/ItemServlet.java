@@ -200,6 +200,55 @@ public class ItemServlet extends HttpServlet {
     }
 
     @Override
+    protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("item delete");
+        String code=req.getParameter("itemCode");
+        System.out.println(code);
+        PrintWriter writer = resp.getWriter();
+        resp.setContentType ( "application/json");
+
+        resp.addHeader("Access-Control-Allow-Origin","*");
+        try {
+
+            Connection connection = ds.getConnection();
+            PreparedStatement pstm = connection.prepareStatement("delete from item where code=?");
+            pstm.setObject(1, code);
+            boolean b = pstm.executeUpdate() > 0;
+
+
+            if (b) {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Succefully deletd");
+                objectBuilder.add("status", 200);
+
+                writer.print(objectBuilder.build());
+
+            } else {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("status", 400);
+                objectBuilder.add("data", "Wrong data");
+                objectBuilder.add("message", "");
+
+
+                writer.print(objectBuilder.build());
+            }
+            connection.close();
+
+        } catch (SQLException throwables) {
+            resp.setStatus(200);
+//            throw new RuntimeException(e);
+            throwables.printStackTrace();
+            //  resp.sendError(500,throwables.getMessage());JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            objectBuilder.add("status",500);
+            objectBuilder.add("data",throwables.getLocalizedMessage());
+            objectBuilder.add("message","Error");
+
+            writer.print(objectBuilder.build());
+        }
+    }
+    @Override
     protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.addHeader("Access-Control-Allow-Origin","*");//
         resp.addHeader("Access-Control-Allow-Methods","DELETE, PUT");
