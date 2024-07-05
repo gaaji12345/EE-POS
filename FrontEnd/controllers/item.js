@@ -1,7 +1,6 @@
-//
-//
+
 $('#btnsaveitem').click(function (){
-  //  saveItem();
+   saveItem();
     loadAllItems();
     // btnRowClick();
     // remove();
@@ -9,29 +8,30 @@ $('#btnsaveitem').click(function (){
 
 });
 //
-// function saveItem() {
-//     let itemID=$('#txtitemcode').val();
-//     let itemName=$('#txtitemname').val();
-//     let itemPrice=$('#txtprice').val();
-//     let itemQty=$('#txtqty').val();
-//
-//     let newItem = Object.assign({}, itemObj);
-//     newItem.itemId=itemID;
-//     newItem.itemName=itemName;
-//     newItem.price=itemPrice;
-//     newItem.qty=itemQty;
-//     if (checkValidtionItem()) {
-//
-//         items.push(newItem);
-//     }else {
-//         clearFeilds();
-//         loadAllItems();
-//     }
-//
-// }
-//
-//
-//
+function saveItem() {
+    var data= $("#itemForm").serialize();
+    console.log(data);
+    $.ajax({
+        url:"http://localhost:4008/backend/item",
+        method:"POST",
+        data:data,
+        success:function (res){
+            if (res.status == 200){
+                alert(res.message);
+              loadAllItems();
+
+            }else {
+                alert(res.data)
+            }
+        },
+        error:function (ob,txtStatus,error){
+            alert(txtStatus);
+
+        }
+    })
+
+}
+
 function loadAllItems(){
     $('#tbItem').empty();
     $.ajax({
@@ -49,6 +49,9 @@ function loadAllItems(){
         }
     })
 }
+
+
+
 //
 // $('#btnUpdateItem').click(function (){
 //
