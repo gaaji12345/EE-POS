@@ -1,4 +1,9 @@
 
+$(document).ready(function() {
+
+  loadAllItems();
+
+});
 $('#btnsaveitem').click(function (){
    saveItem();
     loadAllItems();
@@ -50,30 +55,34 @@ function loadAllItems(){
     })
 }
 
+function  rowBack(){
+    $("#tbItem>tr").click(function (){
+        let id= $(this).children().eq(0).text();
+        let desc= $(this).children().eq(1).text();
+        let price= $(this).children().eq(2).text();
+        let qty= $(this).children().eq(3).text();
+
+        $("#txtitemcode").val(id);
+        $("#txtitemname").val(desc);
+        $("#txtprice").val(price);
+        $("#txtqty").val(qty);
 
 
+
+    })
+}
+
 //
-// $('#btnUpdateItem').click(function (){
-//
-//     let consent=confirm("ARE YOU SHURE NEED TO UPDATE THIS ITEM..?");
-//
-//     if (consent){
-//         for (let i = 0; i < items.length; i++) {
-//             if ($('#txtitemcode').val()==items[i].itemId){
-//                 items[i].itemId=$('#txtitemcode').val();
-//                 items[i].itemNameite=$('#txtitemname').val();
-//                 items[i].price=$('#txtprice').val();
-//                 items[i].qty=$('#txtqty').val();
-//                 //getAllCustomer();
-//                 loadAllItems();
-//                 //clearCustomerFeilds();
-//                 clearFeilds();
-//                 alert("UPDATED SUCSUS");
-//                 break;
-//             }
-//         }
-//     }
-// });
+$('#btnUpdateItem').click(function (){
+
+    let consent=confirm("ARE YOU SHURE NEED TO UPDATE THIS ITEM..?");
+
+    if (consent) {
+      itemUpdate();
+    }else {
+        alert("NO Try Again..!")
+    }
+});
 //
 // $('#btnDeleteItem').click(function (){
 //     let deleteId= $('#txtitemcode').val();
@@ -112,7 +121,37 @@ function loadAllItems(){
 //
 //     });
 // }
-//
+ function  itemUpdate(){
+     var itemOb={
+         code: $('#txtitemcode').val(),
+         desc:$('#txtitemname').val(),
+         price: $('#txtprice').val(),
+         qty:$('#txtqty').val()
+     }
+
+     // console.log(formdata);
+     $.ajax({
+         url:"http://localhost:4008/backend/item",
+         method:"PUT",
+         contentType:"application/json",//request contetnt type json
+         data:JSON.stringify(itemOb),
+         success:function (res){
+             if (res.status=200){
+                 alert(res.message)
+                 loadAllItems();
+             }else if (res.status==400){
+                 alert(res.message)
+             }else {
+                 alert(res.data)
+             }
+
+         },
+         error:function (ob,txtStatus,error){
+             alert(txtStatus);
+             console.log(ob.responseText)
+         }
+     })
+ }
 // function searchItem(id){
 //     for (let i=0;i<items.length;i++){
 //         if (items[i].itemId == id){
