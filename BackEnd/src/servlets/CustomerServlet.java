@@ -15,7 +15,9 @@ import javax.sql.DataSource;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
@@ -83,6 +85,56 @@ public class CustomerServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String id=  req.getParameter("customerId");
+        String name=  req.getParameter("customerName");
+        String add=   req.getParameter("customerAddress");
+        String salary=   req.getParameter("customerSalary");
+
+        System.out.println(id+" "+ name+ " "+add+" " +salary);
+        PrintWriter writer = resp.getWriter();
+        resp.setContentType ( "application/json");
+
+        resp.addHeader("Access-Control-Allow-Origin","*");
+
+        try {
+
+            Connection connection = ds.getConnection();
+            PreparedStatement pstm = connection.prepareStatement("insert into customer values (?,?,?,?)");
+            pstm.setObject(1, id);
+            pstm.setObject(2, name);
+            pstm.setObject(3, add);
+            pstm.setObject(4, salary);
+            boolean b = pstm.executeUpdate() > 0;
+
+//
+
+            if (b) {
+                //resp.setStatus(200);
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                resp.setStatus(HttpServletResponse.SC_CREATED);//browser is read
+                objectBuilder.add("status", 200);
+                objectBuilder.add("message", "Successfully Added");
+                objectBuilder.add("data", "");
+                writer.print(objectBuilder.build());
+
+            }
+            connection.close();
+
+
+        } catch (SQLException throwables) {
+            resp.setStatus(200);
+
+            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            objectBuilder.add("status",400);
+            objectBuilder.add("messages","Error");
+            objectBuilder.add("data",throwables.getLocalizedMessage());
+            writer.print(objectBuilder.build());
+            throwables.printStackTrace();
         }
     }
 
