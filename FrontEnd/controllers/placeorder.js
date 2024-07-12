@@ -64,6 +64,19 @@ function  loadAllItems(){
 }
 
 
-
+$('#cmbIcode').change(function () {
+    $.ajax({
+        url: "http://localhost:4008/backend/item?option=GETALL",
+        method: "GET",
+        dataType: "json",
+        success: function (resp) {
+            for (const item of resp.data) {
+                $('#itemName').val(item.name);
+                $('#itemPrice').val(item.price);
+                $('#iqtyOnHand').val(item.qty);
+            }
+        }
+    })
+});
 
 
