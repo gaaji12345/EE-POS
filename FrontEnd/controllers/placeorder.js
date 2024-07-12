@@ -1,5 +1,8 @@
-LoadAllCustomerIds();
-function LoadAllCustomerIds() {
+loadAllCustomerIds();
+loadAllItems();
+
+
+function loadAllCustomerIds() {
     $('#cmbcId').empty();
     // return new Promise(function (resolve, reject) {
     var Cus = '';
@@ -36,5 +39,31 @@ $('#cmbcId').change(function () {
         }
     })
 });
+
+
+function  loadAllItems(){
+    $('#cmbIcode').empty();
+    // return new Promise(function (resolve, reject) {
+    var Cus = '';
+    $.ajax({
+        url: "http://localhost:4008/backend/item?option=GETALL",
+        method: "GET",
+        dataType: "json",//please convert the response into jason
+        success: function (resp) {
+            for (const item of resp.data) {
+                $("#cmbIcode").empty();
+                Cus += '<option value="' + item.id + '">' + item.id+ '</option>';
+
+                console.log(typeof resp);
+                $("#cmbIcode").append(Cus);
+            }
+            //  btnRowClick();
+            //rowBack();
+        }
+    });
+}
+
+
+
 
 
