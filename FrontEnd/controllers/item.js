@@ -1,15 +1,13 @@
 
 $(document).ready(function() {
 
-  loadAllItems();
+loadAItems()
 
 });
 $('#btnsaveitem').click(function (){
    saveItem();
-    loadAllItems();
-    // btnRowClick();
-    // remove();
-    // itemIds();
+    loadAItems();
+
 
 });
 //
@@ -23,7 +21,7 @@ function saveItem() {
         success:function (res){
             if (res.status == 200){
                 alert(res.message);
-              loadAllItems();
+              loadAItems();
 
             }else {
                 alert(res.data)
@@ -37,17 +35,17 @@ function saveItem() {
 
 }
 
-function loadAllItems(){
+function loadAItems(){
     $('#tbItem').empty();
     $.ajax({
-        url: "http://localhost:4008/backend/item?option=GETALL",
+        url: "http://localhost:4008/backend/item",
         method: "GET",
         dataType: "json",//please convert the response into jason
         success: function (resp) {
             for (const item of resp.data) {
                 // $("#tbjson").empty();
                 console.log(typeof resp);
-                let row = `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.price}</td><td>${item.qty}</td></tr>`
+                let row = `<tr><td>${item.code}</td><td>${item.name}</td><td>${item.price}</td><td>${item.qty}</td></tr>`
                 $("#tbItem").append(row);
             }
             rowBack();
@@ -137,7 +135,7 @@ $('#btnDeleteItem').click(function (){
              console.log(res)
              if (res.status==200){
                  alert(res.message);
-             loadAllItems();
+             loadAItems();
 
              }else if (res.status==400){
                  alert(res.data);

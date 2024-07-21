@@ -2,11 +2,14 @@
 
 LoadAll();
 
+
  });
+
 
 $('#btnsaveCustomer').click(function (){
  saveCustomer();
   LoadAll();
+ // setCusIds();
 });
 
 
@@ -20,7 +23,7 @@ function saveCustomer() {
         success:function (res){
             if (res.status == 200){
                 alert(res.message);
-                loadAllCustomer();
+           LoadAll();
 
             }else {
                 alert(res.data)
@@ -38,21 +41,27 @@ function saveCustomer() {
 
 function LoadAll() {
     $('#tbCustomer').empty();
+   // return new Promise(function (resolve, reject) {
 
-    $.ajax({
-        url:"http://localhost:4008/backend/customer?option=GETALL",
-        method:"GET",
-        dataType:"json",//please convert the response into jason
-        success:function (resp){
-            for (const customer of resp.data){
-                // $("#tbjson").empty();
-                console.log( typeof resp);
-                let row=`<tr><td>${customer.id}</td><td>${customer.name}</td><td>${customer.address}</td><td>${customer.salary}</td></tr>`
-                $("#tbCustomer").append(row);
+        $.ajax({
+            url: "http://localhost:4008/backend/customer",
+            method: "GET",
+            dataType: "json",//please convert the response into jason
+            success: function (resp) {
+                for (const customer of resp) {
+                    // $("#tbjson").empty();
+                    console.log(typeof resp);
+                    let row = `<tr><td>${customer.id}</td><td>${customer.name}</td><td>${customer.address}</td><td>${customer.salary}</td></tr>`
+                    $("#tbCustomer").append(row);
+                }
+      btnRowClick();
+                //rowBack();
             }
-            rowBack();
-        }
-    })
+        })
+
+
+
+}
 
     function rowBack(){
         $("#tbCustomer>tr").click(function (){
@@ -74,20 +83,10 @@ function LoadAll() {
     }
 
 
-}
+
 
 $('#btnUpCustomer').click(function (){
     updateCustomer();
-
-    // let consent=confirm("ARE YOU SHURE NEED TO UPDATE..?");
-    //
-    // if (consent){
-    //   updateCustomer();
-    // }else {
-    //     alert("Not Allowed..!");
-    // }
-
-
 
 });
 
@@ -164,27 +163,39 @@ function btnRowClick (){
      });
  }
 
-function searchCustomer(id){
-    // for (let i=0;i<customers.length;i++){
-    //     if (customers[i].customerID == id){
-    //         return customers[i];
-    //     }
-    // }
-}
+// function searchCustomer(id){
+//     console.log(id);
+//     return new Promise(function (resolve, reject) {
+//         $.ajax({
+//             url:"http://localhost:4008/backend/customer?customerId="+id+"",
+//             method: "GET",
+//             dataType:"json",
+//             success:function (res) {
+//                 console.log(res);
+//                 resolve(res);
+//             },
+//             error:function (ob, textStatus, error) {
+//                 resolve(error);
+//             }
+//         });
+//     });
+// }
 
-$('#btnsearchCustomer').click(function (){
+// $('#btnsearchCustomer').click(function (){
+//
+//     let id = $("#txtCid").val();
+//     searchCustomer(id).then(function (res){
+//         $("#txtName").val(res.name);
+//         $("#txtAddress").val(res.address);
+//     });
+//
+//    // alert("gaaji")
+//    // setClBtn();
+// });
 
-});
 
 
-function deleteCustomer(cId){
-    // let customer=searchCustomer(cId);
-    // if (customer!=null){
-    //     let indexof=customers.indexOf(customer);
-    //     customers.splice(indexof,1);
-    //     LoadAll();
-    // }
-}
+
 
 function updateCustomer(){
     var cusOb={

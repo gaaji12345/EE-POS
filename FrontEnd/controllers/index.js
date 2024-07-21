@@ -2,7 +2,7 @@ $('#customer').css('display','none');
 
 $('#item').css('display','none');
 
-$('#order').css('display','none');
+$('#order-menu').css('display','none');
 
 
 
@@ -18,7 +18,7 @@ $('#navItem').click(function (){
     $('#customer').css('display','none');
     $('#item').css('display','inline-block');
     $('#navMain').css('display','none');
-    $('#order').css('display','none');
+    $('#order-menu').css('display','none');
 
 });
 
@@ -26,14 +26,14 @@ $('#navOrder').click(function (){
     $('#customer').css('display','none');
     $('#item').css('display','none');
     $('#navMain').css('display','none');
-    $('#order').css('display','Inline-block');
+    $('#order-menu').css('display','Inline-block');
 
 });
 $('#navHome').click(function (){
     $('#customer').css('display','none');
     $('#navMain').css('display','inline-block');
     $('#item').css('display','none');
-    $('#order').css('display','none');
+    $('#order-menu').css('display','none');
 
 });
 
