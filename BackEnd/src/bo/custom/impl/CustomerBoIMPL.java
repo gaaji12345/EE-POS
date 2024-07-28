@@ -31,7 +31,15 @@ public class CustomerBoIMPL implements CustomerBo {
     }
 
     @Override
+    public boolean updateCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException {
+        return customerDAO.update(new Customer(dto.getId(), dto.getName(), dto.getAddress(), dto.getSalary()));
+    }
+
+
+    @Override
     public boolean deleteCustomer(String id) throws SQLException, ClassNotFoundException {
         return customerDAO.delete(id);
     }
+
+
 }

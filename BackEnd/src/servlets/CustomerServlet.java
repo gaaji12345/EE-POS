@@ -181,8 +181,8 @@ public class CustomerServlet extends HttpServlet {
 //        String salary=   req.getParameter("customerSalary");
 //
 //        System.out.println(id+" "+ name+ " "+add+" " +salary);
-//        PrintWriter writer = resp.getWriter();
-//        resp.setContentType ( "application/json");
+        PrintWriter writer = resp.getWriter();
+    resp.setContentType ( "application/json");
 
       resp.addHeader("Access-Control-Allow-Origin","*");
 //
@@ -233,48 +233,58 @@ public class CustomerServlet extends HttpServlet {
         boolean isSaved ;
         try {
             isSaved = customerBo.addCustomer(new CustomerDTO(id,name,add,salary));
+
+            if (isSaved){
+                                //resp.setStatus(200);
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                resp.setStatus(HttpServletResponse.SC_CREATED);//browser is read
+                objectBuilder.add("status", 200);
+                objectBuilder.add("message", "Successfully Added");
+                objectBuilder.add("data", "");
+                writer.print(objectBuilder.build());
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            resp.setStatus(200);
+
+            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            objectBuilder.add("status",400);
+            objectBuilder.add("messages","Error");
+            objectBuilder.add("data",e.getLocalizedMessage());
+            writer.print(objectBuilder.build());
+            e.printStackTrace();
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
-        if (isSaved) {
-            resp.getWriter().print(ResponceUtil.genJson("Success", id + " Successfully Added."));
-            resp.setStatus(200);
-        } else {
-            resp.getWriter().print(ResponceUtil.genJson("Error", "Wrong data !"));
-            resp.setStatus(400);
-        }
 
     }
 
 
-//
-//    @Override
-//    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-//        System.out.println("update me");
-//
-//        //resp.getWriter();
-//        PrintWriter writer = resp.getWriter();
-//        resp.setContentType ( "application/json");
-//
-//        resp.addHeader("Access-Control-Allow-Origin","*");
-//
-//        JsonReader reader = Json.createReader(req.getReader());
-//        JsonObject jsonObject = reader.readObject();
-//
-//        String id = jsonObject.getString("id");
-//        String name = jsonObject.getString("name");
-//        String address = jsonObject.getString("address");
-//        String salary = jsonObject.getString("salary" );
-//
-//
-//        System.out.println(id+" "+name+" "+address+" "+salary);
-//
-//
-//        try {
-//
+
+    @Override
+    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        System.out.println("update me");
+
+        PrintWriter writer = resp.getWriter();
+        resp.setContentType ( "application/json");
+
+        resp.addHeader("Access-Control-Allow-Origin","*");
+
+        JsonReader reader = Json.createReader(req.getReader());
+        JsonObject jsonObject = reader.readObject();
+
+        String id = jsonObject.getString("id");
+        String name = jsonObject.getString("name");
+        String address = jsonObject.getString("address");
+        double salary = Double.parseDouble(jsonObject.getString("salary" ));
+
+
+
+        System.out.println(id+" "+name+" "+address+" "+salary);
+
+
+        try {
+
 //            Connection connection = ds.getConnection();
 //            PreparedStatement pstm = connection.prepareStatement("update customer set  name=?,address=?,salary=?  where id=? ");
 //
@@ -283,38 +293,42 @@ public class CustomerServlet extends HttpServlet {
 //            pstm.setObject(3, salary);
 //            pstm.setObject(4, id);
 //            boolean b = pstm.executeUpdate() > 0;
-//
-//            if (b) {
-//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-//                objectBuilder.add("data", "");
-//                objectBuilder.add("message", "Succefully Updated");
-//                objectBuilder.add("status", 200);
-//
-//                writer.print(objectBuilder.build());
-//
-//            } else {
-//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-//                objectBuilder.add("data", "");
-//                objectBuilder.add("message", "Update Failed");
-//                objectBuilder.add("status", 400);
-//                writer.print(objectBuilder.build());
-//            }
-//            connection.close();
-//
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }catch (JsonParsingException e){
-//
-//        }
-//    }
-//
+
+            boolean isUpdated = customerBo.updateCustomer(new CustomerDTO(id, name, address,salary));
+
+            if (isUpdated) {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Succefully Updated");
+                objectBuilder.add("status", 200);
+
+                writer.print(objectBuilder.build());
+
+            } else {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Update Failed");
+                objectBuilder.add("status", 400);
+                writer.print(objectBuilder.build());
+            }
+
+
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }catch (JsonParsingException e){
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     @Override
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 //        System.out.println("cus delete");
 //        String id=req.getParameter("cusID");
 //        System.out.println(id);
-//        PrintWriter writer = resp.getWriter();
+        PrintWriter writer = resp.getWriter();
         resp.setContentType ( "application/json");
 //
       resp.addHeader("Access-Control-Allow-Origin","*");
@@ -363,19 +377,41 @@ public class CustomerServlet extends HttpServlet {
         boolean isDeleted ;
         try {
             isDeleted = customerBo.deleteCustomer(cusID);
+
+
+            if (isDeleted) {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("data", "");
+                objectBuilder.add("message", "Succefully deletd");
+                objectBuilder.add("status", 200);
+
+                writer.print(objectBuilder.build());
+
+            } else {
+                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+                objectBuilder.add("status", 400);
+                objectBuilder.add("data", "Wrong data");
+                objectBuilder.add("message", "");
+
+
+                writer.print(objectBuilder.build());
+            }
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+                        resp.setStatus(200);
+
+            e.printStackTrace();
+            //  resp.sendError(500,throwables.getMessage());JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            objectBuilder.add("status",500);
+            objectBuilder.add("data",e.getLocalizedMessage());
+            objectBuilder.add("message","Error");
+
+            writer.print(objectBuilder.build());
+
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
 
-        if (isDeleted) {
-            resp.getWriter().print(ResponceUtil.genJson("Success", cusID + " Customer Deleted..!"));
-            resp.setStatus(200);
-        } else {
-            resp.getWriter().print(ResponceUtil.genJson("Failed", "Customer with ID " + cusID + " not found."));
-            resp.setStatus(400);
-        }
     }
 
 

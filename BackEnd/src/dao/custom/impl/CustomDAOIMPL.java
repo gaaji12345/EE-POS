@@ -43,8 +43,16 @@ public class CustomDAOIMPL implements CustomerDAO {
     }
 
     @Override
-    public boolean update(Customer customer) throws SQLException, ClassNotFoundException {
-        return false;
+    public boolean update(Customer c) throws SQLException, ClassNotFoundException {
+        try (Connection conn = ds.getConnection()){
+            PreparedStatement pstm = conn.prepareStatement("UPDATE customer SET name=?, address=?, salary=? WHERE id=?");
+            pstm.setString(1, c.getName());
+            pstm.setString(2, c.getAddress());
+            pstm.setDouble(3, c.getSalary());
+            pstm.setString(4, c.getId());
+
+            return pstm.executeUpdate() > 0;
+        }
     }
 
     @Override

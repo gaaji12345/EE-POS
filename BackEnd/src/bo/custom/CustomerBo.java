@@ -13,4 +13,6 @@ public interface CustomerBo {
 
     public boolean deleteCustomer(String id) throws SQLException, ClassNotFoundException;
 
+    public boolean updateCustomer(CustomerDTO dto) throws SQLException, ClassNotFoundException;
+
 }
