@@ -163,28 +163,58 @@ public class ItemServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String code=  req.getParameter("itemCode");
         String name=  req.getParameter("itemDesc");
-        String prce=   req.getParameter("itemPrice");
-        String qty=   req.getParameter("itemQty");
+        double price= Double.parseDouble(req.getParameter("itemPrice"));
 
-        System.out.println(code+" "+ name+ " "+prce+" " +qty);
+      int   qty= Integer.parseInt(req.getParameter("itemQty"));
+//
+//        System.out.println(code+" "+ name+ " "+prce+" " +qty);
         PrintWriter writer = resp.getWriter();
         resp.setContentType ( "application/json");
-
-      //  resp.addHeader("Access-Control-Allow-Origin","*");
-
-        try {
-
-            Connection connection = ds.getConnection();
-            PreparedStatement pstm = connection.prepareStatement("insert into item values (?,?,?,?)");
-            pstm.setObject(1, code);
-            pstm.setObject(2, name);
-            pstm.setObject(3, prce);
-            pstm.setObject(4, qty);
-            boolean b = pstm.executeUpdate() > 0;
-
 //
+       resp.addHeader("Access-Control-Allow-Origin","*");
+//
+//        try {
+//
+//            Connection connection = ds.getConnection();
+//            PreparedStatement pstm = connection.prepareStatement("insert into item values (?,?,?,?)");
+//            pstm.setObject(1, code);
+//            pstm.setObject(2, name);
+//            pstm.setObject(3, prce);
+//            pstm.setObject(4, qty);
+//            boolean b = pstm.executeUpdate() > 0;
+//
+////
+//
+//            if (b) {
+//                //resp.setStatus(200);
+//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+//                resp.setStatus(HttpServletResponse.SC_CREATED);//browser is read
+//                objectBuilder.add("status", 200);
+//                objectBuilder.add("message", "Successfully Added");
+//                objectBuilder.add("data", "");
+//                writer.print(objectBuilder.build());
+//
+//            }
+//            connection.close();
+//
+//
+//        } catch (SQLException throwables) {
+//            resp.setStatus(200);
+//
+//            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+//            objectBuilder.add("status",400);
+//            objectBuilder.add("messages","Error");
+//            objectBuilder.add("data",throwables.getLocalizedMessage());
+//            writer.print(objectBuilder.build());
+//            throwables.printStackTrace();
+//        }
 
-            if (b) {
+
+        boolean isSaved ;
+        try {
+            isSaved = itemBO.saveItem(new ItemDTO(code,name,price,qty));
+
+            if (isSaved){
                 //resp.setStatus(200);
                 JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
                 resp.setStatus(HttpServletResponse.SC_CREATED);//browser is read
@@ -192,21 +222,20 @@ public class ItemServlet extends HttpServlet {
                 objectBuilder.add("message", "Successfully Added");
                 objectBuilder.add("data", "");
                 writer.print(objectBuilder.build());
-
             }
-            connection.close();
-
-
-        } catch (SQLException throwables) {
+        } catch (SQLException e) {
             resp.setStatus(200);
 
             JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
             objectBuilder.add("status",400);
             objectBuilder.add("messages","Error");
-            objectBuilder.add("data",throwables.getLocalizedMessage());
+            objectBuilder.add("data",e.getLocalizedMessage());
             writer.print(objectBuilder.build());
-            throwables.printStackTrace();
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
+
     }
 
 
@@ -225,47 +254,78 @@ public class ItemServlet extends HttpServlet {
 
         String code = jsonObject.getString("code");
         String desc = jsonObject.getString("desc");
-        String price = jsonObject.getString("price");
-        String qty = jsonObject.getString("qty" );
+        double price = Double.parseDouble(jsonObject.getString("price"));
+        int qty = Integer.parseInt(jsonObject.getString("qty" ));
 
 
         System.out.println(code+" "+desc+" "+price+" "+qty);
 
 
+//        try {
+//
+//            Connection connection = ds.getConnection();
+//            PreparedStatement pstm = connection.prepareStatement("update item set   description =?,unitPrice=?,qtyOnHand =?  where code=? ");
+//
+//            pstm.setObject(1, desc);
+//            pstm.setObject(2, price);
+//            pstm.setObject(3, qty);
+//            pstm.setObject(4, code);
+//            boolean b = pstm.executeUpdate() > 0;
+//
+//            if (b) {
+//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+//                objectBuilder.add("data", "");
+//                objectBuilder.add("message", "Succefully Updated");
+//                objectBuilder.add("status", 200);
+//
+//                writer.print(objectBuilder.build());
+//
+//            } else {
+//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+//                objectBuilder.add("data", "");
+//                objectBuilder.add("message", "Update Failed");
+//                objectBuilder.add("status", 400);
+//                writer.print(objectBuilder.build());
+//            }
+//            connection.close();
+//
+//
+//        } catch (SQLException e) {
+//            throw new RuntimeException(e);
+//        }catch (JsonParsingException e){
+//
+//        }
+
         try {
 
-            Connection connection = ds.getConnection();
-            PreparedStatement pstm = connection.prepareStatement("update item set   description =?,unitPrice=?,qtyOnHand =?  where code=? ");
+        boolean isUpdateditem = itemBO.updateItem(new ItemDTO(code, desc, price,qty));
 
-            pstm.setObject(1, desc);
-            pstm.setObject(2, price);
-            pstm.setObject(3, qty);
-            pstm.setObject(4, code);
-            boolean b = pstm.executeUpdate() > 0;
+        if (isUpdateditem) {
+            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            objectBuilder.add("data", "");
+            objectBuilder.add("message", "Succefully Updated");
+            objectBuilder.add("status", 200);
 
-            if (b) {
-                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                objectBuilder.add("data", "");
-                objectBuilder.add("message", "Succefully Updated");
-                objectBuilder.add("status", 200);
+            writer.print(objectBuilder.build());
 
-                writer.print(objectBuilder.build());
-
-            } else {
-                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-                objectBuilder.add("data", "");
-                objectBuilder.add("message", "Update Failed");
-                objectBuilder.add("status", 400);
-                writer.print(objectBuilder.build());
-            }
-            connection.close();
-
+        } else {
+            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+            objectBuilder.add("data", "");
+            objectBuilder.add("message", "Update Failed");
+            objectBuilder.add("status", 400);
+            writer.print(objectBuilder.build());
+        }
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }catch (JsonParsingException e){
 
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
+
+
+
     }
 
     @Override
@@ -277,15 +337,52 @@ public class ItemServlet extends HttpServlet {
         resp.setContentType ( "application/json");
 
         resp.addHeader("Access-Control-Allow-Origin","*");
+//        try {
+//
+//            Connection connection = ds.getConnection();
+//            PreparedStatement pstm = connection.prepareStatement("delete from item where code=?");
+//            pstm.setObject(1, code);
+//            boolean b = pstm.executeUpdate() > 0;
+//
+//
+//            if (b) {
+//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+//                objectBuilder.add("data", "");
+//                objectBuilder.add("message", "Succefully deletd");
+//                objectBuilder.add("status", 200);
+//
+//                writer.print(objectBuilder.build());
+//
+//            } else {
+//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+//                objectBuilder.add("status", 400);
+//                objectBuilder.add("data", "Wrong data");
+//                objectBuilder.add("message", "");
+//
+//
+//                writer.print(objectBuilder.build());
+//            }
+//            connection.close();
+//
+//        } catch (SQLException throwables) {
+//            resp.setStatus(200);
+////            throw new RuntimeException(e);
+//            throwables.printStackTrace();
+//            //  resp.sendError(500,throwables.getMessage());JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+//            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
+//            objectBuilder.add("status",500);
+//            objectBuilder.add("data",throwables.getLocalizedMessage());
+//            objectBuilder.add("message","Error");
+//
+//            writer.print(objectBuilder.build());
+//        }
+
+        boolean isDeleted ;
         try {
-
-            Connection connection = ds.getConnection();
-            PreparedStatement pstm = connection.prepareStatement("delete from item where code=?");
-            pstm.setObject(1, code);
-            boolean b = pstm.executeUpdate() > 0;
+            isDeleted = itemBO.deleteItem(code);
 
 
-            if (b) {
+            if (isDeleted) {
                 JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
                 objectBuilder.add("data", "");
                 objectBuilder.add("message", "Succefully deletd");
@@ -302,19 +399,20 @@ public class ItemServlet extends HttpServlet {
 
                 writer.print(objectBuilder.build());
             }
-            connection.close();
-
-        } catch (SQLException throwables) {
+        } catch (SQLException e) {
             resp.setStatus(200);
-//            throw new RuntimeException(e);
-            throwables.printStackTrace();
+
+            e.printStackTrace();
             //  resp.sendError(500,throwables.getMessage());JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
             JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
             objectBuilder.add("status",500);
-            objectBuilder.add("data",throwables.getLocalizedMessage());
+            objectBuilder.add("data",e.getLocalizedMessage());
             objectBuilder.add("message","Error");
 
             writer.print(objectBuilder.build());
+
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
     }
     @Override
