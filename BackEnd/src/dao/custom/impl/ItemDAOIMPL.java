@@ -74,4 +74,15 @@ public class ItemDAOIMPL implements ItemDAO {
     public Item search(String string) throws SQLException, ClassNotFoundException {
         return null;
     }
+
+    @Override
+    public Boolean updateQty(String id,int qty) throws Exception {
+        try(Connection connection = ds.getConnection()){
+            System.out.println("ItemDAOImpl: " + id + " " + qty);
+            PreparedStatement pstm = connection.prepareStatement("UPDATE Item SET qtyOnHand=item.qtyOnHand-? WHERE code=?");
+            pstm.setInt(1,qty);
+            pstm.setString(2,id);
+            return pstm.executeUpdate()>0;
+        }
+    }
 }
