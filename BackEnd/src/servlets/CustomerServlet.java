@@ -1,106 +1,36 @@
 package servlets;
 
+import bo.BOFActory;
 import bo.custom.CustomerBo;
 import bo.custom.impl.CustomerBoIMPL;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.CustomerDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.SneakyThrows;
-import util.ResponceUtil;
-
 import javax.json.*;
-import javax.json.bind.Jsonb;
-import javax.json.bind.JsonbBuilder;
 import javax.json.stream.JsonParsingException;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
-
 import static Listener.MyListener.ds;
 
 @WebServlet(urlPatterns = "/customer")
 public class CustomerServlet extends HttpServlet {
-//    InitialContext ctx;
-//
-//    {
-//        try {
-//            ctx = new InitialContext();
-//        } catch (NamingException e) {
-//            throw new RuntimeException(e);
-//        }
-//    }
-//
-//    DataSource ds = (DataSource) ctx.lookup
-//            ("java:comp/env/jdbc/pool");
-//
-//
-//
-//    public CustomerServlet() throws NamingException {
-//    }
 
-    CustomerBo customerBo=new CustomerBoIMPL();
+
+    CustomerBo customerBo= (CustomerBo) BOFActory.getBoFactory().getBO(BOFActory.BOTypes.CUSTOMER);
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         System.out.println("customer do get");
 
-        resp.addHeader("Access-Control-Allow-Origin", "*");//
-//        try {
-//            resp.addHeader("ABCD","GAAJI");
-//            String option = req.getParameter("option");
-//            PrintWriter writer = resp.getWriter();
-//
-//
-//            Connection connection = ds.getConnection();
-//
-//                  ResultSet rst = connection.prepareStatement("select * from customer").executeQuery();
-//                    resp.addHeader ("Content-Type", "application/json");
-//
-//                    JsonArrayBuilder arrayBuilder = Json.createArrayBuilder();
-//                    while (rst.next()) {
-//                        String id = rst.getString(1);
-//                        String name = rst.getString(2);
-//                        String address = rst.getString(3);
-//                        double salary = rst.getDouble(4);
-//
-//                        JsonObjectBuilder objectBuilder = Json.createObjectBuilder();//creat json object 1
-//                        objectBuilder.add("id", id ); // Handle null ID
-//                        objectBuilder.add("name", name ); // Handle null name
-//                        objectBuilder.add("address", address ); // Handle null address
-//                        objectBuilder.add("salary", salary );
-//                        arrayBuilder.add(objectBuilder.build());
-//
-//                    }
-//                    //  resp.getWriter().print(arrayBuilder.build());
-//                    JsonObjectBuilder responce = Json.createObjectBuilder();
-//                    responce.add("status",200);
-//                    responce.add("message","Done");
-//                    responce.add("data",arrayBuilder.build());
-//                    writer.print(responce.build());
-//                   // break;
-//
-//
-//            connection.close();
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+    //    resp.addHeader("Access-Control-Allow-Origin", "*");//
 
-
-//
         String customerId = req.getParameter("customerId");
         if (customerId != null) {
             getAll(customerId, resp);
@@ -135,7 +65,7 @@ public class CustomerServlet extends HttpServlet {
 
 
     private void getAll(String customerId, HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "*");
+      //  response.setHeader("Access-Control-Allow-Origin", "*");
         response.setContentType("application/json");
 
         try (Connection connection = ds.getConnection()) {
@@ -184,7 +114,7 @@ public class CustomerServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
     resp.setContentType ( "application/json");
 
-      resp.addHeader("Access-Control-Allow-Origin","*");
+    //  resp.addHeader("Access-Control-Allow-Origin","*");
 //
 //        try {
 //
@@ -268,7 +198,7 @@ public class CustomerServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         resp.setContentType ( "application/json");
 
-        resp.addHeader("Access-Control-Allow-Origin","*");
+      //  resp.addHeader("Access-Control-Allow-Origin","*");
 
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
@@ -331,7 +261,7 @@ public class CustomerServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         resp.setContentType ( "application/json");
 //
-      resp.addHeader("Access-Control-Allow-Origin","*");
+     // resp.addHeader("Access-Control-Allow-Origin","*");
 //        try {
 //
 //            Connection connection = ds.getConnection();
@@ -415,10 +345,10 @@ public class CustomerServlet extends HttpServlet {
     }
 
 
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin","*");//
-        resp.addHeader("Access-Control-Allow-Methods","DELETE, PUT");
-        resp.addHeader("Access-Control-Allow-Headers","Content-Type");
-    }
+//    @Override
+//    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        resp.addHeader("Access-Control-Allow-Origin","*");//
+//        resp.addHeader("Access-Control-Allow-Methods","DELETE, PUT");
+//        resp.addHeader("Access-Control-Allow-Headers","Content-Type");
+//    }
 }

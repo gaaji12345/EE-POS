@@ -1,5 +1,7 @@
 package servlets;
 
+import bo.BOFActory;
+import bo.custom.CustomerBo;
 import bo.custom.ItemBO;
 import bo.custom.impl.ItemBOIMPL;
 import dto.CustomerDTO;
@@ -45,19 +47,22 @@ public class ItemServlet extends HttpServlet {
     public ItemServlet() throws NamingException {
     }
 
-    ItemBO itemBO=new ItemBOIMPL();
+    ItemBO itemBO=(ItemBO) BOFActory.getBoFactory().getBO(BOFActory.BOTypes.ITEM);
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 //        System.out.println("Item do get");
 //        try {
 //            resp.addHeader("ABCD","GAAJI");
 //            String option = req.getParameter("option");
-           PrintWriter writer = resp.getWriter();
+           PrintWriter writer ;
+        System.out.println("Item Do get");
+
 //
 //
 //            Connection connection = ds.getConnection();
 //
-           resp.addHeader("Access-Control-Allow-Origin","*");
+     //      resp.addHeader("Access-Control-Allow-Origin","*");
 //
 //
 //          //  switch (option){
@@ -127,7 +132,7 @@ public class ItemServlet extends HttpServlet {
 
 
     private void getAll(String itemCode, HttpServletResponse response) {
-        response.setHeader("Access-Control-Allow-Origin", "*");
+     //   response.setHeader("Access-Control-Allow-Origin", "*");
         response.setContentType("application/json");
 
         try (Connection connection = ds.getConnection()) {
@@ -171,43 +176,8 @@ public class ItemServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         resp.setContentType ( "application/json");
 //
-       resp.addHeader("Access-Control-Allow-Origin","*");
-//
-//        try {
-//
-//            Connection connection = ds.getConnection();
-//            PreparedStatement pstm = connection.prepareStatement("insert into item values (?,?,?,?)");
-//            pstm.setObject(1, code);
-//            pstm.setObject(2, name);
-//            pstm.setObject(3, prce);
-//            pstm.setObject(4, qty);
-//            boolean b = pstm.executeUpdate() > 0;
-//
-////
-//
-//            if (b) {
-//                //resp.setStatus(200);
-//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-//                resp.setStatus(HttpServletResponse.SC_CREATED);//browser is read
-//                objectBuilder.add("status", 200);
-//                objectBuilder.add("message", "Successfully Added");
-//                objectBuilder.add("data", "");
-//                writer.print(objectBuilder.build());
-//
-//            }
-//            connection.close();
-//
-//
-//        } catch (SQLException throwables) {
-//            resp.setStatus(200);
-//
-//            JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-//            objectBuilder.add("status",400);
-//            objectBuilder.add("messages","Error");
-//            objectBuilder.add("data",throwables.getLocalizedMessage());
-//            writer.print(objectBuilder.build());
-//            throwables.printStackTrace();
-//        }
+      // resp.addHeader("Access-Control-Allow-Origin","*");
+
 
 
         boolean isSaved ;
@@ -247,7 +217,7 @@ public class ItemServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         resp.setContentType ( "application/json");
 
-        resp.addHeader("Access-Control-Allow-Origin","*");
+       // resp.addHeader("Access-Control-Allow-Origin","*");
 
         JsonReader reader = Json.createReader(req.getReader());
         JsonObject jsonObject = reader.readObject();
@@ -261,40 +231,7 @@ public class ItemServlet extends HttpServlet {
         System.out.println(code+" "+desc+" "+price+" "+qty);
 
 
-//        try {
-//
-//            Connection connection = ds.getConnection();
-//            PreparedStatement pstm = connection.prepareStatement("update item set   description =?,unitPrice=?,qtyOnHand =?  where code=? ");
-//
-//            pstm.setObject(1, desc);
-//            pstm.setObject(2, price);
-//            pstm.setObject(3, qty);
-//            pstm.setObject(4, code);
-//            boolean b = pstm.executeUpdate() > 0;
-//
-//            if (b) {
-//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-//                objectBuilder.add("data", "");
-//                objectBuilder.add("message", "Succefully Updated");
-//                objectBuilder.add("status", 200);
-//
-//                writer.print(objectBuilder.build());
-//
-//            } else {
-//                JsonObjectBuilder objectBuilder = Json.createObjectBuilder();
-//                objectBuilder.add("data", "");
-//                objectBuilder.add("message", "Update Failed");
-//                objectBuilder.add("status", 400);
-//                writer.print(objectBuilder.build());
-//            }
-//            connection.close();
-//
-//
-//        } catch (SQLException e) {
-//            throw new RuntimeException(e);
-//        }catch (JsonParsingException e){
-//
-//        }
+
 
         try {
 
@@ -336,7 +273,7 @@ public class ItemServlet extends HttpServlet {
         PrintWriter writer = resp.getWriter();
         resp.setContentType ( "application/json");
 
-        resp.addHeader("Access-Control-Allow-Origin","*");
+        //resp.addHeader("Access-Control-Allow-Origin","*");
 //        try {
 //
 //            Connection connection = ds.getConnection();
@@ -415,10 +352,10 @@ public class ItemServlet extends HttpServlet {
             throw new RuntimeException(e);
         }
     }
-    @Override
-    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        resp.addHeader("Access-Control-Allow-Origin","*");//
-        resp.addHeader("Access-Control-Allow-Methods","DELETE, PUT");
-        resp.addHeader("Access-Control-Allow-Headers","Content-Type");
-    }
+//    @Override
+//    protected void doOptions(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        resp.addHeader("Access-Control-Allow-Origin","*");//
+//        resp.addHeader("Access-Control-Allow-Methods","DELETE, PUT");
+//        resp.addHeader("Access-Control-Allow-Headers","Content-Type");
+//    }
 }
