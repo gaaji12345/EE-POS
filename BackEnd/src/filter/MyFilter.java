@@ -17,11 +17,14 @@ import java.io.IOException;
 public class MyFilter extends HttpFilter {
     @Override
     protected void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        System.out.println("Filter Call");
+
         response.addHeader("Access-Control-Allow-Origin","*");
         response.addHeader("Access-Control-Allow-Methods","GET,POST,PUT,DELETE,OPTIONS");
         response.addHeader("Access-Control-Allow-Headers","Content-Type");
+        System.out.println("Filter Out");
         chain.doFilter(request, response);
-       
+
     }
     }
 
